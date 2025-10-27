@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmotionSense | AI-Powered Sentiment Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --accent: #ff6b81;
+            --accent-hover: #ff4757;
+            --text: #333;
+            --text-light: #666;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border: #e0e0e0;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            --primary: #7c93e6;
+            --primary-dark: #6b83d4;
+            --secondary: #8a67b0;
+            --accent: #ff7b8f;
+            --accent-hover: #ff5a72;
+            --text: #f0f0f0;
+            --text-light: #b0b0b0;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --border: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 30px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .theme-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+
+        .main-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px var(--shadow);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 16px;
+            outline: none;
+            resize: vertical;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .primary-btn {
+            background: var(--accent);
+            color: white;
+            flex: 1;
+        }
+
+        .primary-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4);
+        }
+
+        .secondary-btn {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .secondary-btn:hover {
+            background: var(--bg);
+            transform: translateY(-2px);
+        }
+
+        .result-container {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .sentiment-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .sentiment-text {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .sentiment-desc {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .sentiment-positive {
+            color: var(--success);
+        }
+
+        .sentiment-negative {
+            color: var(--danger);
+        }
+
+        .sentiment-neutral {
+            color: var(--warning);
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .stats-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .history-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .history-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-text {
+            flex: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            margin-right: 15px;
+        }
+
+        .history-sentiment {
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .history-positive {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .history-negative {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+        }
+
+        .history-neutral {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+            padding: 20px 0;
+            width: 100%;
+            border-top: 1px solid var(--border);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .main-card {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <span>EmotionSense</span>
+            </div>
+            <div class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark Mode</span>
+            </div>
+        </header>
+
+        <div class="main-card">
+            <h1>AI Sentiment Analysis</h1>
+            <p class="subtitle">Understand the emotional tone of your text with our advanced AI</p>
+            
+            <div class="input-group">
+                <textarea id="text" placeholder="Type your text here to analyze its sentiment..."></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="primary-btn" id="analyzeBtn">
+                    <i class="fas fa-chart-line"></i>
+                    Analyze Sentiment
+                </button>
+                <button class="secondary-btn" id="clearBtn">
+                    <i class="fas fa-eraser"></i>
+                    Clear Text
+                </button>
+            </div>
+            
+            <div class="result-container" id="result">
+                <div class="sentiment-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <div class="sentiment-text">Your result will appear here</div>
+                <div class="sentiment-desc">Enter text and click "Analyze Sentiment"</div>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stats-title">
+                <i class="fas fa-chart-bar"></i>
+                Analysis Statistics
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalAnalyses">0</div>
+                    <div class="stat-label">Total Analyses</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="positiveCount">0</div>
+                    <div class="stat-label">Positive</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="negativeCount">0</div>
+                    <div class="stat-label">Negative</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="neutralCount">0</div>
+                    <div class="stat-label">Neutral</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-card">
+            <div class="history-title">
+                <i class="fas fa-history"></i>
+                Analysis History
+            </div>
+            <div class="history-list" id="historyList">
+                <!-- History items will be added here dynamically -->
+                <div class="history-item empty-history">
+                    No analysis history yet. Your analyzed texts will appear here.
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>EmotionSense © 2025 | AI-Powered Sentiment Analysis Tool by Asad Aziz</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const textInput = document.getElementById('text');
+        const resultContainer = document.getElementById('result');
+        const historyList = document.getElementById('historyList');
+        const totalAnalyses = document.getElementById('totalAnalyses');
+        const positiveCount = document.getElementById('positiveCount');
+        const negativeCount = document.getElementById('negativeCount');
+        const neutralCount = document.getElementById('neutralCount');
+
+        // State variables
+        let isDarkMode = false;
+        let analysisHistory = JSON.parse(localStorage.getItem('emotionSenseHistory')) || [];
+        let stats = JSON.parse(localStorage.getItem('emotionSenseStats')) || {
+            total: 0,
+            positive: 0,
+            negative: 0,
+            neutral: 0
+        };
+
+        // Initialize the app
+        function initApp() {
+            updateStatsDisplay();
+            renderHistory();
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('emotionSenseTheme');
+            if (savedTheme === 'dark') {
+                enableDarkMode();
+            }
+        }
+
+        // Theme toggle functionality
+        themeToggle.addEventListener('click', () => {
+            if (isDarkMode) {
+                disableDarkMode();
+            } else {
+                enableDarkMode();
+            }
+        });
+
+        function enableDarkMode() {
+            document.body.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+            isDarkMode = true;
+            localStorage.setItem('emotionSenseTheme', 'dark');
+        }
+
+        function disableDarkMode() {
+            document.body.classList.remove('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i><span>Dark Mode</span>';
+            isDarkMode = false;
+            localStorage.setItem('emotionSenseTheme', 'light');
+        }
+
+        // Analyze button functionality
+        analyzeBtn.addEventListener('click', async () => {
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                showResult('⚠️ Please enter some text to analyze', 'neutral');
+                return;
+            }
+            
+            // Show loading state
+            analyzeBtn.innerHTML = '<div class="loading"></div> Analyzing...';
+            analyzeBtn.disabled = true;
+            
+            try {
+                // Simulate API call - replace with your actual endpoint
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ text })
+                });
+                
+                const data = await response.json();
+                
+                // Update UI with result
+                const sentiment = data.sentiment || 'neutral';
+                showResult(text, sentiment);
+                
+                // Add to history and update stats
+                addToHistory(text, sentiment);
+                updateStats(sentiment);
+                
+            } catch (error) {
+                console.error('Error analyzing text:', error);
+                showResult('❌ Error analyzing text. Please try again.', 'negative');
+            } finally {
+                // Reset button state
+                analyzeBtn.innerHTML = '<i class="fas fa-chart-line"></i> Analyze Sentiment';
+                analyzeBtn.disabled = false;
+            }
+        });
+
+        // Clear button functionality
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            textInput.focus();
+            resetResultDisplay();
+        });
+
+        // Show result with appropriate styling
+        function showResult(text, sentiment) {
+            const sentimentIcons = {
+                positive: 'fas fa-smile-beam',
+                negative: 'fas fa-frown',
+                neutral: 'fas fa-meh'
+            };
+            
+            const sentimentLabels = {
+                positive: 'Positive',
+                negative: 'Negative',
+                neutral: 'Neutral'
+            };
+            
+            const sentimentDescriptions = {
+                positive: 'The text expresses positive emotions and sentiments.',
+                negative: 'The text expresses negative emotions and sentiments.',
+                neutral: 'The text is neutral or mixed in emotional tone.'
+            };
+            
+            resultContainer.innerHTML = `
+                <div class="sentiment-icon sentiment-${sentiment}">
+                    <i class="${sentimentIcons[sentiment]}"></i>
+                </div>
+                <div class="sentiment-text sentiment-${sentiment}">
+                    ${sentimentLabels[sentiment]}
+                </div>
+                <div class="sentiment-desc">
+                    ${sentimentDescriptions[sentiment]}
+                </div>
+            `;
+        }
+
+        // Reset result display to initial state
+        function resetResultDisplay() {
+            resultContainer.innerHTML = `
+                <div class="sentiment-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <div class="sentiment-text">Your result will appear here</div>
+                <div class="sentiment-desc">Enter text and click "Analyze Sentiment"</div>
+            `;
+        }
+
+        // Add analysis to history
+        function addToHistory(text, sentiment) {
+            const historyItem = {
+                text,
+                sentiment,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            analysisHistory.unshift(historyItem);
+            
+            // Keep only last 10 items
+            if (analysisHistory.length > 10) {
+                analysisHistory = analysisHistory.slice(0, 10);
+            }
+            
+            localStorage.setItem('emotionSenseHistory', JSON.stringify(analysisHistory));
+            renderHistory();
+        }
+
+        // Render history list
+        function renderHistory() {
+            if (analysisHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-item empty-history">No analysis history yet. Your analyzed texts will appear here.</div>';
+                return;
+            }
+            
+            historyList.innerHTML = analysisHistory.map(item => `
+                <div class="history-item">
+                    <div class="history-text" title="${item.text}">${item.text}</div>
+                    <div class="history-sentiment history-${item.sentiment}">${item.sentiment}</div>
+                </div>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStats(sentiment) {
+            stats.total++;
+            
+            if (sentiment === 'positive') stats.positive++;
+            else if (sentiment === 'negative') stats.negative++;
+            else stats.neutral++;
+            
+            localStorage.setItem('emotionSenseStats', JSON.stringify(stats));
+            updateStatsDisplay();
+        }
+
+        // Update statistics display
+        function updateStatsDisplay() {
+            totalAnalyses.textContent = stats.total;
+            positiveCount.textContent = stats.positive;
+            negativeCount.textContent = stats.negative;
+            neutralCount.textContent = stats.neutral;
+        }
+
+        // Initialize the application
+        initApp();
+    </script>
+</body>
+</html>
