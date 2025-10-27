@@ -4,7 +4,7 @@ import pickle
 app = Flask(__name__)
 
 # Load model
-model, vectorizer = pickle.load(open('model/sentiment_model.pkl', 'rb'))
+model, vectorizer = pickle.load(open('sentiment_model.pkl', 'rb'))
 
 @app.route('/')
 def home():
@@ -20,3 +20,4 @@ def predict():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
