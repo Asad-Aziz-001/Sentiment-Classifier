@@ -31,15 +31,23 @@ The core idea is to show:
 
 EmotionSense/
 │
+
 ├── model/
-│ └── sentiment_model.pkl # Trained sentiment model
+
+ └── sentiment_model.pkl # Trained sentiment model
+
 │
 ├── templates/
-│ └── index.html # Webpage layout
+
+ └── index.html # Webpage layout
 │
+
 ├── app.py # Flask backend server
+
 ├── train_model.py # Model training script
+
 ├── requirements.txt # Python dependencies
+
 └── README.md # Project description
 
 
