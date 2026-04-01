@@ -1,129 +1,136 @@
 import streamlit as st
 import pickle
+import os
 
-st.set_page_config(page_title="Sentiment AI", page_icon="🚀", layout="centered")
+# Page configuration (modern look)
+st.set_page_config(
+    page_title="Sentiment Analyzer",
+    page_icon="😊",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-# 🌈 Advanced CSS
+# Custom CSS for modern UI
 st.markdown("""
-<style>
-
-/* Animated Gradient Background */
-.stApp {
-    background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #38bdf8);
-    background-size: 400% 400%;
-    animation: gradient 12s ease infinite;
-    color: white;
-}
-
-@keyframes gradient {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-}
-
-/* Glass Card */
-.glass {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    padding: 2rem;
-    border-radius: 25px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-}
-
-/* Title Glow */
-.title {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: bold;
-    background: linear-gradient(90deg, #38bdf8, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Textarea */
-textarea {
-    border-radius: 15px !important;
-    border: 2px solid #60a5fa !important;
-    background: rgba(255,255,255,0.1) !important;
-    color: white !important;
-}
-
-/* Button */
-.stButton>button {
-    border-radius: 15px;
-    background: linear-gradient(135deg, #3b82f6, #22c55e);
-    color: white;
-    font-size: 1.1rem;
-    padding: 0.7rem;
-    transition: all 0.3s ease;
-}
-.stButton>button:hover {
-    transform: scale(1.07);
-    box-shadow: 0 0 20px #3b82f6;
-}
-
-/* Result Card Glow */
-.result {
-    padding: 2rem;
-    border-radius: 20px;
-    text-align: center;
-    margin-top: 1.5rem;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {opacity:0; transform: translateY(20px);}
-    to {opacity:1; transform: translateY(0);}
-}
-
-</style>
+    <style>
+    .main {
+        padding: 2rem;
+    }
+    .stTextArea textarea {
+        font-size: 1.1rem;
+        border-radius: 12px;
+        border: 2px solid #4a90e2;
+    }
+    .result-card {
+        padding: 2rem;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        color: white;
+        text-align: center;
+        margin: 1.5rem 0;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    }
+    .emoji {
+        font-size: 4.5rem;
+        margin-bottom: 1rem;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-# 🔥 Title
-st.markdown("<div class='title'>🚀 Sentiment AI Analyzer</div>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Premium AI-powered sentiment detection</p>", unsafe_allow_html=True)
+# Title and description
+st.title("😊 Sentiment Analyzer")
+st.markdown("### Analyze the sentiment of your text instantly")
+st.markdown("Enter any text below and get instant positive/negative prediction using your trained model.")
 
-# Load model
+# Load the model (with error handling)
 @st.cache_resource
 def load_model():
-    model, vectorizer = pickle.load(open('sentiment_model.pkl', 'rb'))
-    return model, vectorizer
+    try:
+        with st.spinner("Loading sentiment model..."):
+            model, vectorizer = pickle.load(open('sentiment_model.pkl', 'rb'))
+        st.success("✅ Model loaded successfully!")
+        return model, vectorizer
+    except FileNotFoundError:
+        st.error("❌ Model file 'sentiment_model.pkl' not found. Please make sure it's in the same folder as this app.")
+        st.stop()
+    except Exception as e:
+        st.error(f"❌ Error loading model: {e}")
+        st.stop()
 
 model, vectorizer = load_model()
 
-# Glass Container
-st.markdown("<div class='glass'>", unsafe_allow_html=True)
+# Main input area
+text = st.text_area(
+    label="Enter your text here 👇",
+    placeholder="Type or paste your review, tweet, comment, or any text...",
+    height=180,
+    max_chars=2000
+)
 
-text = st.text_area("Enter your text 👇", height=150)
+# Analyze button with modern styling
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    analyze_button = st.button(
+        "🔍 Analyze Sentiment",
+        type="primary",
+        use_container_width=True,
+        help="Click to predict sentiment"
+    )
 
-if st.button("✨ Analyze Sentiment"):
+if analyze_button:
     if text.strip() == "":
-        st.warning("Enter some text first")
+        st.warning("⚠️ Please enter some text to analyze.")
     else:
-        X = vectorizer.transform([text])
-        prediction = model.predict(X)[0]
+        with st.spinner("Analyzing sentiment..."):
+            # Transform text and predict
+            X = vectorizer.transform([text])
+            prediction = model.predict(X)[0]
+            
+            # Determine sentiment and emoji
+            if prediction == 1:
+                sentiment = "Positive"
+                emoji = "😊"
+                color = "#22c55e"  # green
+                bg_color = "linear-gradient(135deg, #166534, #4ade80)"
+            else:
+                sentiment = "Negative"
+                emoji = "😞"
+                color = "#ef4444"  # red
+                bg_color = "linear-gradient(135deg, #991b1b, #f87171)"
+            
+            # Display beautiful result card
+            st.markdown(f"""
+                <div class="result-card" style="background: {bg_color};">
+                    <div class="emoji">{emoji}</div>
+                    <h2 style="margin: 0; font-size: 2.2rem;">{sentiment}</h2>
+                    <p style="margin: 0.5rem 0 0 0; opacity: 0.9; font-size: 1.1rem;">
+                        Your text expresses a <strong>{sentiment.lower()}</strong> sentiment
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Additional info in columns
+            col_a, col_b = st.columns(2)
+            with col_a:
+                st.metric(
+                    label="Prediction",
+                    value=sentiment,
+                    delta=None
+                )
+            with col_b:
+                st.metric(
+                    label="Model Confidence",
+                    value="High" if hasattr(model, 'predict_proba') else "N/A"
+                )
 
-        if prediction == 1:
-            sentiment = "Positive"
-            emoji = "😎"
-            bg = "linear-gradient(135deg, #16a34a, #4ade80)"
-        else:
-            sentiment = "Negative"
-            emoji = "😡"
-            bg = "linear-gradient(135deg, #dc2626, #f87171)"
-
-        st.markdown(f"""
-        <div class="result" style="background:{bg};">
-            <h1 style="font-size:4rem;">{emoji}</h1>
-            <h2>{sentiment}</h2>
-            <p>AI detected a {sentiment.lower()} sentiment</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
+            # Show the original text in an expander
+            with st.expander("📝 View Input Text", expanded=False):
+                st.write(text)
 
 # Footer
+st.markdown("---")
 st.markdown(
-    "<p style='text-align:center; opacity:0.6; margin-top:20px;'>Built by Asad Aziz ⚡</p>",
+    "<p style='text-align: center; color: #64748b; font-size: 0.9rem;'>"
+    "Built by ASAD AZIZ</p>",
     unsafe_allow_html=True
 )
