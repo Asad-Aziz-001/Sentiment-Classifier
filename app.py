@@ -59,7 +59,6 @@ textarea {
 
 # Title
 st.markdown("<h1 style='text-align:center;'>✨ Sentiment Analyzer</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Analyze your text with AI 🚀</p>", unsafe_allow_html=True)
 
 # Load model
 @st.cache_resource
@@ -71,7 +70,7 @@ model, vectorizer = load_model()
 
 # Glass container
 with st.container():
-    st.markdown('<div class="glass">', unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Analyze your text with AI 🚀</p>", unsafe_allow_html=True)
 
     text = st.text_area("Enter text 👇", height=150)
 
