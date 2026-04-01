@@ -1,87 +1,66 @@
 import streamlit as st
 import pickle
 
-st.set_page_config(page_title="Sentiment AI", page_icon="🚀", layout="centered")
+st.set_page_config(page_title="EmotionSense", page_icon="🧠", layout="centered")
 
-# 🌈 Advanced CSS
+# 🔥 CSS (converted from your HTML)
 st.markdown("""
 <style>
 
-/* Animated Gradient Background */
+/* Background */
 .stApp {
-    background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #38bdf8);
-    background-size: 400% 400%;
-    animation: gradient 12s ease infinite;
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
 }
 
-@keyframes gradient {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-}
-
-/* Glass Card */
-.glass {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
+/* Card */
+.card {
+    background: rgba(255,255,255,0.1);
     padding: 2rem;
-    border-radius: 25px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* Title Glow */
+/* Title */
 .title {
-    text-align: center;
     font-size: 2.5rem;
     font-weight: bold;
-    background: linear-gradient(90deg, #38bdf8, #60a5fa);
+    background: linear-gradient(to right, #fff, #ddd);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-align: center;
 }
 
 /* Textarea */
 textarea {
-    border-radius: 15px !important;
-    border: 2px solid #60a5fa !important;
+    border-radius: 12px !important;
     background: rgba(255,255,255,0.1) !important;
     color: white !important;
 }
 
 /* Button */
 .stButton>button {
-    border-radius: 15px;
-    background: linear-gradient(135deg, #3b82f6, #22c55e);
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ff6b81, #ff4757);
     color: white;
-    font-size: 1.1rem;
-    padding: 0.7rem;
-    transition: all 0.3s ease;
-}
-.stButton>button:hover {
-    transform: scale(1.07);
-    box-shadow: 0 0 20px #3b82f6;
+    font-size: 1rem;
 }
 
-/* Result Card Glow */
+/* Result */
 .result {
-    padding: 2rem;
-    border-radius: 20px;
+    padding: 1.5rem;
+    border-radius: 15px;
     text-align: center;
-    margin-top: 1.5rem;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {opacity:0; transform: translateY(20px);}
-    to {opacity:1; transform: translateY(0);}
+    margin-top: 1rem;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # 🔥 Title
-st.markdown("<div class='title'>🚀 Sentiment AI Analyzer</div>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Premium AI-powered sentiment detection</p>", unsafe_allow_html=True)
+st.markdown("<div class='title'>🧠 EmotionSense</div>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>AI Sentiment Analysis Tool</p>", unsafe_allow_html=True)
 
 # Load model
 @st.cache_resource
@@ -91,14 +70,36 @@ def load_model():
 
 model, vectorizer = load_model()
 
-# Glass Container
-st.markdown("<div class='glass'>", unsafe_allow_html=True)
+# Session state (history + stats)
+if "history" not in st.session_state:
+    st.session_state.history = []
 
-text = st.text_area("Enter your text 👇", height=150)
+if "stats" not in st.session_state:
+    st.session_state.stats = {"total":0, "positive":0, "negative":0}
 
-if st.button("✨ Analyze Sentiment"):
+# Main card
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+
+text = st.text_area("Enter text", label_visibility="collapsed", height=150)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    analyze = st.button("🚀 Analyze")
+
+with col2:
+    clear = st.button("🧹 Clear")
+
+# Clear
+if clear:
+    st.session_state.history = []
+    st.session_state.stats = {"total":0, "positive":0, "negative":0}
+    st.rerun()
+
+# Analyze
+if analyze:
     if text.strip() == "":
-        st.warning("Enter some text first")
+        st.warning("Enter some text")
     else:
         X = vectorizer.transform([text])
         prediction = model.predict(X)[0]
@@ -106,24 +107,57 @@ if st.button("✨ Analyze Sentiment"):
         if prediction == 1:
             sentiment = "Positive"
             emoji = "😎"
-            bg = "linear-gradient(135deg, #16a34a, #4ade80)"
+            color = "#22c55e"
         else:
             sentiment = "Negative"
             emoji = "😡"
-            bg = "linear-gradient(135deg, #dc2626, #f87171)"
+            color = "#ef4444"
 
+        # Save history
+        st.session_state.history.insert(0, (text, sentiment))
+        st.session_state.history = st.session_state.history[:10]
+
+        # Stats update
+        st.session_state.stats["total"] += 1
+        if sentiment == "Positive":
+            st.session_state.stats["positive"] += 1
+        else:
+            st.session_state.stats["negative"] += 1
+
+        # Result UI
         st.markdown(f"""
-        <div class="result" style="background:{bg};">
-            <h1 style="font-size:4rem;">{emoji}</h1>
+        <div class="result" style="background:{color};">
+            <h1>{emoji}</h1>
             <h2>{sentiment}</h2>
-            <p>AI detected a {sentiment.lower()} sentiment</p>
         </div>
         """, unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
+# 📊 Stats
+st.markdown("### 📊 Statistics")
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Total", st.session_state.stats["total"])
+col2.metric("Positive", st.session_state.stats["positive"])
+col3.metric("Negative", st.session_state.stats["negative"])
+
+# 🕒 History
+st.markdown("### 🕒 History")
+
+for item in st.session_state.history:
+    st.markdown(f"""
+    <div style="
+        background: rgba(255,255,255,0.1);
+        padding:10px;
+        border-radius:10px;
+        margin-bottom:8px;">
+        <b>{item[1]}</b> — {item[0][:50]}
+    </div>
+    """, unsafe_allow_html=True)
+
 # Footer
 st.markdown(
-    "<p style='text-align:center; opacity:0.6; margin-top:20px;'>Built by Asad Aziz ⚡</p>",
+    "<p style='text-align:center; opacity:0.7;'>Built by Asad Aziz 🚀</p>",
     unsafe_allow_html=True
 )
