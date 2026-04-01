@@ -21,7 +21,7 @@ The core idea is to show:
 
 ✅ Simple and clean Flask-based architecture  
 ✅ Custom sentiment classifier (no pre-trained models)  
-✅ Elegant, glassmorphic UI built with HTML 
+✅ Elegant, glassmorphic UI built with HTML
 ✅ Emoji-based real-time feedback (Positive / Negative)  
 ✅ Easy to understand and extend  
 
