@@ -19,12 +19,11 @@ The core idea is to show:
 
 ## 🚀 Features
 
-✅ Simple and clean Flask-based architecture  
-✅ Custom sentiment classifier (no pre-trained models)  
+✅ Simple and clean Flask-based architecture
+✅ Custom sentiment classifier (no pre-trained models)
 ✅ Elegant, glassmorphic UI built with HTML
-✅ Emoji-based real-time feedback (Positive / Negative)  
+✅ Emoji-based real-time feedback (Positive / Negative)
 ✅ Easy to understand and extend  
-
 ---
 
 ## 🏗️ Project Structure
@@ -32,14 +31,14 @@ The core idea is to show:
 EmotionSense/
 │
 
-├── model/
+   ├── model/
 
- └── sentiment_model.pkl # Trained sentiment model
+    └── sentiment_model.pkl # Trained sentiment model
 
 │
 ├── templates/
 
- └── index.html # Webpage layout
+    └── index.html # Webpage layout
 │
 
 ├── app.py # Flask backend server
@@ -69,3 +68,6 @@ python app.py
 
 
 Then open your browser at 👉 http://127.0.0.1:5000
+
+## Live app
+Open your browser 👉 https://sentiment-classifier-001.streamlit.app/
